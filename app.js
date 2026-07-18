@@ -1,16 +1,16 @@
 // Configurations for YouTube Ambient Sounds
 const SOUNDS_CONFIG = {
-    rain: { videoId: 'wX-y0M-3p4U', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
-    campfire: { videoId: 'L_LUpnjgPso', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
-    nature: { videoId: '62G4V654_b4', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
-    ocean: { videoId: 'Nep1qytq9JM', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
-    cafe: { videoId: 'gaGrHUekGrc', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
-    thunder: { videoId: 'T-BOPr7NXME', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 30, fadeInterval: null },
-    wind: { videoId: 'H1yB3AX1j8A', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 40, fadeInterval: null },
-    lofi: { videoId: '5w3kADg-Xik', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 40, fadeInterval: null }
+    rain: { videoId: 'wX-y0M-3p4U', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
+    campfire: { videoId: 'L_LUpnjgPso', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
+    nature: { videoId: '62G4V654_b4', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
+    ocean: { videoId: 'Nep1qytq9JM', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
+    cafe: { videoId: 'gaGrHUekGrc', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
+    thunder: { videoId: 'T-BOPr7NXME', player: null, isPlaying: false, currentVolume: 30, fadeInterval: null },
+    wind: { videoId: 'H1yB3AX1j8A', player: null, isPlaying: false, currentVolume: 40, fadeInterval: null },
+    lofi: { videoId: '5w3kADg-Xik', player: null, isPlaying: false, currentVolume: 40, fadeInterval: null }
 };
 
-// Expanded Presets configuration
+// Presets configuration
 const PRESETS = {
     'rainy-cafe': { rain: 50, cafe: 60, thunder: 30, lofi: 30, campfire: 0, nature: 0, ocean: 0, wind: 0 },
     'beach-camp': { campfire: 70, ocean: 50, wind: 30, rain: 0, nature: 0, cafe: 0, thunder: 0, lofi: 0 },
@@ -20,24 +20,23 @@ const PRESETS = {
     'winter-cabin': { campfire: 60, wind: 50, rain: 30, nature: 0, ocean: 0, cafe: 0, thunder: 0, lofi: 0 }
 };
 
-// Global states
 let playersReadyCount = 0;
 const totalPlayersCount = Object.keys(SOUNDS_CONFIG).length;
 
-// Initialize YouTube Players
+// Initialize YouTube API Players
 function onYouTubeIframeAPIReady() {
     Object.keys(SOUNDS_CONFIG).forEach(key => {
         const sound = SOUNDS_CONFIG[key];
         sound.player = new YT.Player(`yt-player-${key}`, {
-            height: '100',
-            width: '100',
+            height: '200',
+            width: '200',
             videoId: sound.videoId,
             playerVars: {
-                autoplay: 0,
+                autoplay: 1, // Autoplay on load in muted state
                 controls: 0,
                 loop: 1,
                 playlist: sound.videoId,
-                mute: 1, // Start muted for browser autoplay policies
+                mute: 1, // Compliance with browser autoplay policies
                 playsinline: 1,
                 disablekb: 1,
                 fs: 0,
@@ -56,54 +55,46 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event, key) {
     playersReadyCount++;
     const sound = SOUNDS_CONFIG[key];
-    sound.player.setVolume(0); // Start at volume 0 for fade-in logic
+    
+    // Command player to start playing muted immediately under the hood
+    sound.player.mute();
+    sound.player.setVolume(0);
+    sound.player.playVideo();
     
     if (playersReadyCount === totalPlayersCount) {
         document.getElementById('footer-mixer-status').textContent = 'Hệ thống âm thanh sẵn sàng';
     }
 }
 
-// State Machine Sync with YouTube IFrame Player API
 function onPlayerStateChange(event, key) {
     const sound = SOUNDS_CONFIG[key];
     
-    // When video starts actually playing (buffering completed)
+    // Once video actually starts playing under the hood, unMute it but keep volume at 0
     if (event.data === YT.PlayerState.PLAYING) {
-        if (sound.isPlaying) {
-            // Unset loading state, set playing state
-            updateCardStateUI(key, 'playing');
-            sound.isActuallyPlaying = true;
-            fadeInAudio(key, sound.currentVolume);
+        sound.player.unMute();
+        // If sound was not toggled ON, keep volume 0
+        if (!sound.isPlaying) {
+            sound.player.setVolume(0);
         } else {
-            // Safe guard: if user clicked 'Tắt' before it started playing
-            sound.player.pauseVideo();
+            sound.player.setVolume(sound.currentVolume);
         }
     }
     
-    // If video is buffering
-    if (event.data === YT.PlayerState.BUFFERING) {
-        if (sound.isPlaying) {
-            updateCardStateUI(key, 'loading');
-        }
-    }
-
-    // Backup loop control
+    // Fallback: loop video if it ends
     if (event.data === YT.PlayerState.ENDED) {
-        if (sound.isPlaying) {
-            sound.player.playVideo();
-        }
+        sound.player.playVideo();
     }
 }
 
-// Fade-in volume transition
-function fadeInAudio(key, targetVolume, duration = 1200) {
+// Instant Fade Audio (200ms duration for click feedback, no lag)
+function fadeAudio(key, targetVolume, duration = 200) {
     const sound = SOUNDS_CONFIG[key];
     if (!sound.player || typeof sound.player.setVolume !== 'function') return;
 
     if (sound.fadeInterval) clearInterval(sound.fadeInterval);
 
     const startVolume = sound.player.getVolume();
-    const steps = 20;
+    const steps = 10;
     const stepTime = duration / steps;
     const volumeStep = (targetVolume - startVolume) / steps;
     let currentStep = 0;
@@ -111,7 +102,7 @@ function fadeInAudio(key, targetVolume, duration = 1200) {
     sound.fadeInterval = setInterval(() => {
         currentStep++;
         const newVol = startVolume + (volumeStep * currentStep);
-        sound.player.setVolume(Math.min(Math.round(newVol), 100));
+        sound.player.setVolume(Math.min(Math.max(Math.round(newVol), 0), 100));
 
         if (currentStep >= steps) {
             clearInterval(sound.fadeInterval);
@@ -120,79 +111,43 @@ function fadeInAudio(key, targetVolume, duration = 1200) {
     }, stepTime);
 }
 
-// Fade-out volume transition
-function fadeOutAudio(key, duration = 1000) {
-    const sound = SOUNDS_CONFIG[key];
-    if (!sound.player || typeof sound.player.setVolume !== 'function') return;
-
-    if (sound.fadeInterval) clearInterval(sound.fadeInterval);
-
-    const startVolume = sound.player.getVolume();
-    const steps = 20;
-    const stepTime = duration / steps;
-    const volumeStep = startVolume / steps;
-    let currentStep = 0;
-
-    sound.fadeInterval = setInterval(() => {
-        currentStep++;
-        const newVol = startVolume - (volumeStep * currentStep);
-        sound.player.setVolume(Math.max(Math.round(newVol), 0));
-
-        if (currentStep >= steps) {
-            clearInterval(sound.fadeInterval);
-            sound.player.setVolume(0);
-            sound.player.pauseVideo();
-            sound.player.mute();
-            sound.isActuallyPlaying = false;
-        }
-    }, stepTime);
-}
-
-// Toggle Sound with immediate visual feedback (no UI lag)
+// Toggle sound instantly
 function toggleSound(key) {
     const sound = SOUNDS_CONFIG[key];
     
     if (sound.isPlaying) {
-        // Turn OFF instantly in UI
         sound.isPlaying = false;
-        updateCardStateUI(key, 'idle');
-        fadeOutAudio(key);
+        updateCardUI(key, false);
+        fadeAudio(key, 0); // Fade volume down to 0 instantly
     } else {
-        // Turn ON instantly in UI (Loading state)
         sound.isPlaying = true;
-        updateCardStateUI(key, 'loading');
+        updateCardUI(key, true);
         
-        // Command YouTube Player to play under the hood
-        sound.player.unMute();
-        sound.player.setVolume(0); // Start at 0, fade will increase it
+        // Ensure video is playing and fade volume up immediately
         sound.player.playVideo();
+        fadeAudio(key, sound.currentVolume);
     }
 }
 
-// Update UI card state instantly (idle, loading, playing)
-function updateCardStateUI(key, state) {
+// Update card play states instantly on UI
+function updateCardUI(key, isPlaying) {
     const card = document.querySelector(`.sound-card[data-sound="${key}"]`);
     if (!card) return;
 
     const toggleBtn = card.querySelector('.btn-toggle-sound');
     const btnText = toggleBtn.querySelector('.btn-text');
 
-    // Remove all state classes
-    card.classList.remove('playing', 'loading');
-
-    if (state === 'playing') {
+    if (isPlaying) {
         card.classList.add('playing');
         btnText.textContent = 'Tắt';
-    } else if (state === 'loading') {
-        card.classList.add('loading');
     } else {
+        card.classList.remove('playing');
         btnText.textContent = 'Bật';
     }
 
     updateFooterStatus();
 }
 
-// Update footer status bar summary
 function updateFooterStatus() {
     const activeKeys = Object.keys(SOUNDS_CONFIG).filter(k => SOUNDS_CONFIG[k].isPlaying);
     const activeText = document.getElementById('footer-mixer-status');
@@ -208,12 +163,12 @@ function updateFooterStatus() {
     }
 }
 
-// Apply Preset
+// Apply selected preset instantly
 function applyPreset(presetKey) {
     const presetValues = PRESETS[presetKey];
     if (!presetValues) return;
 
-    // Toggle active state in Preset buttons
+    // Update active visual class in presets list
     document.querySelectorAll('.preset-card').forEach(card => {
         if (card.dataset.preset === presetKey) {
             card.classList.add('active');
@@ -226,7 +181,7 @@ function applyPreset(presetKey) {
         const targetVol = presetValues[key] || 0;
         const sound = SOUNDS_CONFIG[key];
         
-        // Sync Slider UI values
+        // Update slider UI elements
         const card = document.querySelector(`.sound-card[data-sound="${key}"]`);
         if (card) {
             const slider = card.querySelector('.volume-slider');
@@ -237,35 +192,27 @@ function applyPreset(presetKey) {
 
         if (targetVol > 0) {
             sound.currentVolume = targetVol;
-            if (!sound.isPlaying) {
-                sound.isPlaying = true;
-                updateCardStateUI(key, 'loading');
-                sound.player.unMute();
-                sound.player.setVolume(0);
-                sound.player.playVideo();
-            } else if (sound.isActuallyPlaying) {
-                // If already playing, just fade volume to target
-                fadeInAudio(key, targetVol, 800);
-            }
+            sound.isPlaying = true;
+            updateCardUI(key, true);
+            sound.player.playVideo();
+            fadeAudio(key, targetVol);
         } else {
-            if (sound.isPlaying) {
-                sound.isPlaying = false;
-                updateCardStateUI(key, 'idle');
-                fadeOutAudio(key, 800);
-            }
+            sound.isPlaying = false;
+            updateCardUI(key, false);
+            fadeAudio(key, 0);
         }
     });
 }
 
-// Mute all active sounds
+// Mute all active sounds instantly
 function muteAll() {
     document.querySelectorAll('.preset-card').forEach(card => card.classList.remove('active'));
 
     Object.keys(SOUNDS_CONFIG).forEach(key => {
         if (SOUNDS_CONFIG[key].isPlaying) {
             SOUNDS_CONFIG[key].isPlaying = false;
-            updateCardStateUI(key, 'idle');
-            fadeOutAudio(key, 600);
+            updateCardUI(key, false);
+            fadeAudio(key, 0);
         }
     });
 }
@@ -468,7 +415,7 @@ todoList.addEventListener('click', (e) => {
             return t;
         });
         saveTodos();
-        setTimeout(renderTodos, 200); // Allow toggle check animation to complete
+        setTimeout(renderTodos, 200);
     }
 });
 
@@ -523,16 +470,14 @@ function initSoundCards() {
         const slider = card.querySelector('.volume-slider');
         const badge = card.querySelector('.volume-badge');
 
-        // Toggle click Bật/Tắt
         toggleBtn.addEventListener('click', () => toggleSound(soundKey));
 
-        // Volume slider update
         slider.addEventListener('input', (e) => {
             const vol = parseInt(e.target.value);
             SOUNDS_CONFIG[soundKey].currentVolume = vol;
             badge.textContent = `${vol}%`;
 
-            if (SOUNDS_CONFIG[soundKey].isActuallyPlaying) {
+            if (SOUNDS_CONFIG[soundKey].isPlaying) {
                 const player = SOUNDS_CONFIG[soundKey].player;
                 if (player && typeof player.setVolume === 'function') {
                     player.setVolume(vol);
@@ -541,10 +486,8 @@ function initSoundCards() {
         });
     });
 
-    // Mute all trigger
     document.getElementById('mute-all-btn').addEventListener('click', muteAll);
 
-    // Preset card click triggers
     document.querySelectorAll('.preset-card').forEach(card => {
         card.addEventListener('click', () => {
             const presetKey = card.dataset.preset;
@@ -553,7 +496,6 @@ function initSoundCards() {
     });
 }
 
-// Pomodoro listeners
 timerStartBtn.addEventListener('click', toggleTimer);
 timerResetBtn.addEventListener('click', resetTimer);
 document.querySelectorAll('.mode-selector-btn').forEach(btn => {
@@ -562,7 +504,6 @@ document.querySelectorAll('.mode-selector-btn').forEach(btn => {
     });
 });
 
-// App Entry
 document.addEventListener('DOMContentLoaded', () => {
     renderTodos();
     initSoundCards();

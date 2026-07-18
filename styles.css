@@ -21,11 +21,10 @@
     --gradient-glow: linear-gradient(135deg, rgba(99, 102, 241, 0.15) 0%, rgba(139, 92, 246, 0.1) 100%);
     --gradient-border: linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(99, 102, 241, 0.15) 100%);
     
-    /* Glow Positions */
-    --accent-glow-start: #8b5cf6;
+    /* Font Fallbacks */
+    --font-heading: 'Outfit', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    --font-body: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     
-    --font-heading: 'Outfit', sans-serif;
-    --font-body: 'Inter', sans-serif;
     --radius-lg: 24px;
     --radius-md: 16px;
     --radius-sm: 12px;
@@ -91,15 +90,9 @@ body {
 }
 
 @keyframes float-glow {
-    0% {
-        transform: translate(0, 0) scale(1);
-    }
-    50% {
-        transform: translate(50px, 30px) scale(1.1);
-    }
-    100% {
-        transform: translate(-30px, -50px) scale(0.9);
-    }
+    0% { transform: translate(0, 0) scale(1); }
+    50% { transform: translate(50px, 30px) scale(1.1); }
+    100% { transform: translate(-30px, -50px) scale(0.9); }
 }
 
 /* Layout Wrapper */
@@ -794,17 +787,6 @@ body {
     box-shadow: 0 8px 30px rgba(99, 102, 241, 0.12);
 }
 
-.sound-card.loading {
-    border-color: rgba(255, 255, 255, 0.15);
-    background-color: rgba(255, 255, 255, 0.02);
-    animation: card-pulse 1.5s infinite ease-in-out;
-}
-
-@keyframes card-pulse {
-    0%, 100% { opacity: 0.85; }
-    50% { opacity: 1; }
-}
-
 .card-body {
     display: flex;
     gap: 1rem;
@@ -982,35 +964,6 @@ body {
     box-shadow: 0 6px 16px rgba(99, 102, 241, 0.35);
 }
 
-/* Spinner element for buffer loading status */
-.btn-toggle-sound .spinner {
-    display: none;
-    width: 14px;
-    height: 14px;
-    border: 2px solid rgba(255, 255, 255, 0.25);
-    border-top: 2px solid #ffffff;
-    border-radius: 50%;
-    animation: loading-spin 0.65s linear infinite;
-}
-
-@keyframes loading-spin {
-    to { transform: rotate(360deg); }
-}
-
-.sound-card.loading .btn-toggle-sound {
-    background: rgba(255, 255, 255, 0.04);
-    border-color: rgba(255, 255, 255, 0.12);
-    cursor: not-allowed;
-}
-
-.sound-card.loading .btn-toggle-sound .btn-text {
-    display: none;
-}
-
-.sound-card.loading .btn-toggle-sound .spinner {
-    display: block;
-}
-
 /* Footer layout style */
 .app-footer {
     margin-top: auto;
@@ -1045,16 +998,23 @@ body {
     color: var(--text-secondary);
 }
 
-/* Hidden YouTube frames container */
+/* Hidden YouTube frames container - Absolutely Embedded and Out of view */
 .youtube-hidden-players {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    opacity: 0.001;
-    pointer-events: none;
-    overflow: hidden;
-    left: -100px;
-    top: -100px;
+    position: fixed !important;
+    top: 0 !important;
+    left: -9999px !important;
+    width: 300px !important;
+    height: 300px !important;
+    opacity: 0.0001 !important;
+    pointer-events: none !important;
+    overflow: hidden !important;
+    z-index: -99999 !important;
+}
+
+.youtube-hidden-players iframe {
+    width: 100% !important;
+    height: 100% !important;
+    border: none !important;
 }
 
 /* Responsive layout adjustments */
