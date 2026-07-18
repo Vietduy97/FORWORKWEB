@@ -3,298 +3,422 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>forwork - Tập trung & Thư giãn với Pomodoro & Phối âm</title>
-    <!-- Google Fonts: Outfit & Inter -->
+    <title>forwork - Không gian Tập trung & Phối âm Đỉnh cao</title>
+    <!-- Google Fonts: Outfit (tiêu đề) & Inter (nội dung) -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <!-- Background overlay for depth -->
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
+    <!-- Ambient Background Glow Elements -->
+    <div class="ambient-glow glow-primary"></div>
+    <div class="ambient-glow glow-secondary"></div>
+    <div class="ambient-glow glow-tertiary"></div>
 
     <div class="app-container">
-        <!-- Header -->
+        <!-- Modern Header -->
         <header class="app-header">
-            <div class="logo">
-                <span class="logo-dot"></span>
-                <h1>forwork</h1>
+            <div class="logo-area">
+                <div class="logo-icon-pulse">
+                    <span class="pulse-ring"></span>
+                    <span class="pulse-dot"></span>
+                </div>
+                <div class="logo-text">
+                    <h1>forwork</h1>
+                    <span class="logo-sub">workspace flow</span>
+                </div>
             </div>
-            <nav class="tab-navigation">
-                <button class="tab-btn active" data-tab="focus">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tab-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                    Tập trung
+            
+            <nav class="navigation-tabs">
+                <button class="nav-tab active" data-tab="focus">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span>Tập trung</span>
                 </button>
-                <button class="tab-btn" data-tab="mixer">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="tab-icon"><path d="M4 10h16M4 14h16M4 18h16M14 6H4M20 6h-2"/></svg>
-                    Phối âm
+                <button class="nav-tab" data-tab="mixer">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="nav-icon"><path d="M4 10h16M4 14h16M4 18h16M14 6H4M20 6h-2"/></svg>
+                    <span>Phối âm</span>
                 </button>
             </nav>
         </header>
 
-        <!-- Main Content -->
-        <main class="app-main">
-            <!-- TAB 1: FOCUS -->
-            <section id="tab-focus" class="tab-content active">
-                <div class="focus-layout">
-                    <!-- Left: Pomodoro Timer -->
-                    <div class="pomodoro-card glass-panel">
-                        <div class="timer-modes">
-                            <button class="mode-btn active" data-mode="work">Làm việc</button>
-                            <button class="mode-btn" data-mode="short">Nghỉ ngắn</button>
-                            <button class="mode-btn" data-mode="long">Nghỉ dài</button>
+        <!-- Main Content Wrapper -->
+        <main class="app-body">
+            <!-- TAB 1: FOCUS AREA -->
+            <section id="tab-focus" class="tab-panel active">
+                <div class="focus-grid">
+                    <!-- Column 1: Minimalist Pomodoro -->
+                    <div class="timer-section glass-card">
+                        <div class="timer-mode-selector">
+                            <button class="mode-selector-btn active" data-mode="work">Làm việc</button>
+                            <button class="mode-selector-btn" data-mode="short">Nghỉ ngắn</button>
+                            <button class="mode-selector-btn" data-mode="long">Nghỉ dài</button>
                         </div>
-                        <div class="timer-display-container">
-                            <svg class="progress-ring" width="280" height="280">
-                                <circle class="progress-ring-bg" stroke="rgba(255,255,255,0.05)" stroke-width="8" fill="transparent" r="120" cx="140" cy="140"/>
-                                <circle class="progress-ring-bar" stroke="var(--primary-color)" stroke-width="8" stroke-linecap="round" fill="transparent" r="120" cx="140" cy="140"/>
+                        
+                        <div class="pomodoro-timer-container">
+                            <svg class="progress-indicator" width="300" height="300" viewBox="0 0 300 300">
+                                <defs>
+                                    <linearGradient id="timer-glow" x1="0%" y1="0%" x2="100%" y2="100%">
+                                        <stop offset="0%" stop-color="var(--accent-glow-start)" />
+                                        <stop offset="100%" stop-color="var(--primary-color)" />
+                                    </linearGradient>
+                                </defs>
+                                <circle class="track" stroke="rgba(255,255,255,0.03)" stroke-width="6" fill="transparent" r="130" cx="150" cy="150"/>
+                                <circle class="bar" stroke="url(#timer-glow)" stroke-width="8" stroke-linecap="round" fill="transparent" r="130" cx="150" cy="150"/>
                             </svg>
-                            <div class="timer-text-overlay">
-                                <span class="timer-time" id="timer-time">25:00</span>
-                                <span class="timer-status" id="timer-status">Hãy bắt đầu thôi!</span>
+                            <div class="timer-digital-overlay">
+                                <span id="timer-time" class="digits">25:00</span>
+                                <span id="timer-status" class="status-msg">Học sâu, làm chất</span>
                             </div>
                         </div>
-                        <div class="timer-controls">
-                            <button id="timer-start" class="btn btn-primary">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M8 5v14l11-7z"/></svg>
+                        
+                        <div class="timer-action-buttons">
+                            <button id="timer-start" class="action-btn btn-play-pause">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-svg"><path d="M8 5v14l11-7z"/></svg>
                                 <span>Bắt đầu</span>
                             </button>
-                            <button id="timer-reset" class="btn btn-secondary">
-                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+                            <button id="timer-reset" class="action-btn btn-restart" title="Đặt lại đồng hồ">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-svg"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
                             </button>
                         </div>
                     </div>
 
-                    <!-- Right: Notes & Tasks -->
-                    <div class="productive-widgets">
-                        <!-- Tasks Widget -->
-                        <div class="tasks-card glass-panel">
-                            <h3 class="widget-title">Nhiệm vụ hôm nay</h3>
-                            <form id="todo-form" class="todo-input-container">
-                                <input type="text" id="todo-input" placeholder="Thêm việc cần làm..." required>
-                                <button type="submit" class="todo-add-btn">
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+                    <!-- Column 2: Tasks & Notes Widgets -->
+                    <div class="utility-widgets">
+                        <!-- Daily Checklist Widget -->
+                        <div class="widget-box glass-card todo-widget">
+                            <div class="widget-header">
+                                <h3>Nhiệm vụ trong ngày</h3>
+                                <span class="badge" id="todo-count">0 việc</span>
+                            </div>
+                            
+                            <form id="todo-form" class="todo-composer">
+                                <input type="text" id="todo-input" placeholder="Viết mục tiêu tiếp theo..." required autocomplete="off">
+                                <button type="submit" class="composer-submit" title="Thêm việc">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
                                 </button>
                             </form>
-                            <div class="todo-list-wrapper">
-                                <ul id="todo-list" class="todo-list">
-                                    <!-- Dynamic items -->
+                            
+                            <div class="todo-list-scroll">
+                                <ul id="todo-list" class="checklist-items">
+                                    <!-- Dynamic elements from app.js -->
                                 </ul>
                             </div>
                         </div>
 
-                        <!-- Notes Widget -->
-                        <div class="notes-card glass-panel">
-                            <div class="notes-header">
-                                <h3 class="widget-title">Ghi chú nhanh</h3>
-                                <span class="save-indicator" id="save-indicator">Đã lưu tự động</span>
+                        <!-- Sticky Auto-save Notes Widget -->
+                        <div class="widget-box glass-card notes-widget">
+                            <div class="widget-header">
+                                <h3>Ghi chú nhanh</h3>
+                                <div class="notes-status" id="save-indicator">
+                                    <span class="status-dot"></span>
+                                    <span class="status-txt">Đã lưu cục bộ</span>
+                                </div>
                             </div>
-                            <textarea id="notes-textarea" placeholder="Viết những suy nghĩ, ý tưởng hoặc lưu ý tại đây... Ghi chú sẽ tự động được lưu trữ!"></textarea>
+                            <textarea id="notes-textarea" placeholder="Nơi ghi chép nhanh ý tưởng, checklist phụ hoặc bất cứ thứ gì... Hệ thống tự lưu sau mỗi chữ bạn gõ."></textarea>
                         </div>
                     </div>
                 </div>
             </section>
 
-            <!-- TAB 2: SOUND MIXER -->
-            <section id="tab-mixer" class="tab-content">
-                <!-- Control Panel (Presets + Global Actions) -->
-                <div class="mixer-header-actions glass-panel">
-                    <div class="presets-section">
-                        <span class="section-label">Bản phối gợi ý:</span>
-                        <div class="presets-buttons">
-                            <button class="preset-btn" data-preset="rainy-cafe">☕ Mưa đêm quán Cafe</button>
-                            <button class="preset-btn" data-preset="beach-camp">🔥 Lửa trại bờ biển</button>
-                            <button class="preset-btn" data-preset="deep-focus">🧠 Tập trung sâu</button>
-                            <button class="preset-btn" data-preset="forest-storm">⚡ Bão rừng nhiệt đới</button>
-                        </div>
+            <!-- TAB 2: ADVANCED SOUND MIXER -->
+            <section id="tab-mixer" class="tab-panel">
+                <!-- Premium Presets Container -->
+                <div class="presets-container glass-card">
+                    <div class="presets-title-area">
+                        <h3>Bản phối gợi ý</h3>
+                        <p>Các không gian âm thanh được thiết kế tối ưu, nâng niu thính giác của bạn.</p>
                     </div>
-                    <div class="global-audio-controls">
-                        <button id="mute-all-btn" class="btn btn-danger">
+                    
+                    <div class="presets-grid">
+                        <button class="preset-card" data-preset="rainy-cafe">
+                            <div class="preset-card-icon">☕</div>
+                            <div class="preset-card-info">
+                                <h4>Mưa đêm quán Cafe</h4>
+                                <span>Tiếng mưa giăng ngoài hiên, quán cafe vắng khách ấm áp.</span>
+                            </div>
+                        </button>
+                        
+                        <button class="preset-card" data-preset="beach-camp">
+                            <div class="preset-card-icon">🔥</div>
+                            <div class="preset-card-info">
+                                <h4>Lửa trại bờ biển</h4>
+                                <span>Tiếng củi lách tách ấm nồng hòa cùng sóng biển dạt dào.</span>
+                            </div>
+                        </button>
+                        
+                        <button class="preset-card" data-preset="deep-focus">
+                            <div class="preset-card-icon">🧠</div>
+                            <div class="preset-card-info">
+                                <h4>Tập trung sâu</h4>
+                                <span>Nhạc Lofi êm nhẹ kết hợp tiếng mưa và gió nhẹ lý tưởng.</span>
+                            </div>
+                        </button>
+                        
+                        <button class="preset-card" data-preset="forest-storm">
+                            <div class="preset-card-icon">⚡</div>
+                            <div class="preset-card-info">
+                                <h4>Bão rừng nhiệt đới</h4>
+                                <span>Cơn mưa rừng xối xả, tiếng sấm trầm hùng dội bên tai.</span>
+                            </div>
+                        </button>
+                        
+                        <button class="preset-card" data-preset="sweet-dreams">
+                            <div class="preset-card-icon">💤</div>
+                            <div class="preset-card-info">
+                                <h4>Thư giãn dễ ngủ</h4>
+                                <span>Bản phối êm ái giữa mưa rơi, sóng vỗ nhẹ nâng đỡ giấc ngủ.</span>
+                            </div>
+                        </button>
+                        
+                        <button class="preset-card" data-preset="winter-cabin">
+                            <div class="preset-card-icon">❄️</div>
+                            <div class="preset-card-info">
+                                <h4>Căn lều mùa đông</h4>
+                                <span>Gió tuyết rít ngoài cửa sổ gỗ, bếp củi sưởi ấm căn phòng.</span>
+                            </div>
+                        </button>
+                    </div>
+                    
+                    <div class="presets-global-bar">
+                        <button id="mute-all-btn" class="btn-mute-all">
                             <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="btn-icon"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><line x1="23" y1="9" x2="17" y2="15"/><line x1="17" y1="9" x2="23" y2="15"/></svg>
-                            Tắt tất cả
+                            Tắt toàn bộ âm thanh
                         </button>
                     </div>
                 </div>
 
-                <!-- Grid of Sounds -->
+                <!-- Sound Cards Grid -->
                 <div class="sound-grid">
-                    <!-- 1. Tiếng mưa -->
-                    <div class="sound-card glass-panel" data-sound="rain">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8" y2="22"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="16" y1="16" x2="16" y2="22"/></svg>
+                    <!-- Card 1: Rain -->
+                    <div class="sound-card glass-card" data-sound="rain">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20 17.58A5 5 0 0 0 18 8h-1.26A8 8 0 1 0 4 16.25"/><line x1="8" y1="16" x2="8" y2="22"/><line x1="12" y1="18" x2="12" y2="22"/><line x1="16" y1="16" x2="16" y2="22"/></svg>
                             </div>
-                            <div class="sound-details">
+                            <div class="card-details">
                                 <h4>Mưa rơi</h4>
-                                <span class="sound-desc">Mưa êm dịu bên cửa sổ</span>
+                                <span class="card-desc">Mưa mát bên cửa sổ</span>
                             </div>
-                            <!-- Sound Wave Animation -->
-                            <div class="sound-wave-anim">
+                            
+                            <!-- Sound Wave Visualizer Animation -->
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="50">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="50">
+                                <span class="volume-badge">50%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 2. Bếp lửa -->
-                    <div class="sound-card glass-panel" data-sound="campfire">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/><path d="M4 22h16"/></svg>
+                    <!-- Card 2: Campfire -->
+                    <div class="sound-card glass-card" data-sound="campfire">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/><path d="M4 22h16"/></svg>
                             </div>
-                            <div class="sound-details">
-                                <h4>Bếp củi</h4>
-                                <span class="sound-desc">Tiếng lửa lách tách ấm áp</span>
+                            <div class="card-details">
+                                <h4>Bếp lửa</h4>
+                                <span class="card-desc">Lửa trại ấm tách bập bùng</span>
                             </div>
-                            <div class="sound-wave-anim">
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="50">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="50">
+                                <span class="volume-badge">50%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 3. Thiên nhiên rừng cây -->
-                    <div class="sound-card glass-panel" data-sound="nature">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+                    <!-- Card 3: Nature -->
+                    <div class="sound-card glass-card" data-sound="nature">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
                             </div>
-                            <div class="sound-details">
+                            <div class="card-details">
                                 <h4>Thiên nhiên</h4>
-                                <span class="sound-desc">Tiếng chim rừng & gió nhẹ</span>
+                                <span class="card-desc">Chim hót rừng thu xào xạc</span>
                             </div>
-                            <div class="sound-wave-anim">
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="50">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="50">
+                                <span class="volume-badge">50%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 4. Sóng biển -->
-                    <div class="sound-card glass-panel" data-sound="ocean">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.5 0 2.5 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2s2.5 2 5 2c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2s2.5 2 5 2c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
+                    <!-- Card 4: Ocean -->
+                    <div class="sound-card glass-card" data-sound="ocean">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 6c.6.5 1.2 1 2.5 1C7 7 7 5 9.5 5c2.5 0 2.5 2 5 2 2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 12c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2s2.5 2 5 2c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1M2 18c.6.5 1.2 1 2.5 1 2.5 0 2.5-2 5-2s2.5 2 5 2c2.5 0 2.5-2 5-2 1.3 0 1.9.5 2.5 1"/></svg>
                             </div>
-                            <div class="sound-details">
+                            <div class="card-details">
                                 <h4>Sóng biển</h4>
-                                <span class="sound-desc">Sóng vỗ bờ cát rì rào</span>
+                                <span class="card-desc">Sóng vỗ bờ cát nhẹ êm</span>
                             </div>
-                            <div class="sound-wave-anim">
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="50">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="50">
+                                <span class="volume-badge">50%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 5. Quán Cafe -->
-                    <div class="sound-card glass-panel" data-sound="cafe">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
+                    <!-- Card 5: Cafe -->
+                    <div class="sound-card glass-card" data-sound="cafe">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8h1a4 4 0 0 1 0 8h-1M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z"/><line x1="6" y1="1" x2="6" y2="4"/><line x1="10" y1="1" x2="10" y2="4"/><line x1="14" y1="1" x2="14" y2="4"/></svg>
                             </div>
-                            <div class="sound-details">
+                            <div class="card-details">
                                 <h4>Quán Cafe</h4>
-                                <span class="sound-desc">Tiếng chuyện trò & cốc dĩa</span>
+                                <span class="card-desc">Tiếng thì thầm & cốc tách</span>
                             </div>
-                            <div class="sound-wave-anim">
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="50">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="50">
+                                <span class="volume-badge">50%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 6. Sấm sét -->
-                    <div class="sound-card glass-panel" data-sound="thunder">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 8.58M13 11l-4 6h6l-3 5"/></svg>
+                    <!-- Card 6: Thunder -->
+                    <div class="sound-card glass-card" data-sound="thunder">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 16.9A5 5 0 0 0 18 7h-1.26a8 8 0 1 0-11.62 8.58M13 11l-4 6h6l-3 5"/></svg>
                             </div>
-                            <div class="sound-details">
+                            <div class="card-details">
                                 <h4>Sấm bão</h4>
-                                <span class="sound-desc">Tiếng sấm gầm trầm lắng</span>
+                                <span class="card-desc">Tiếng sấm rền từ phía xa</span>
                             </div>
-                            <div class="sound-wave-anim">
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="30">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="30">
+                                <span class="volume-badge">30%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 7. Gió rít -->
-                    <div class="sound-card glass-panel" data-sound="wind">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
+                    <!-- Card 7: Wind -->
+                    <div class="sound-card glass-card" data-sound="wind">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9.59 4.59A2 2 0 1 1 11 8H2m10.59 11.41A2 2 0 1 0 14 16H2m15.73-8.27A2.5 2.5 0 1 1 19.5 12H2"/></svg>
                             </div>
-                            <div class="sound-details">
+                            <div class="card-details">
                                 <h4>Gió thổi</h4>
-                                <span class="sound-desc">Gió thổi lạnh qua rừng tuyết</span>
+                                <span class="card-desc">Gió thổi lạnh qua rừng tuyết</span>
                             </div>
-                            <div class="sound-wave-anim">
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="40">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="40">
+                                <span class="volume-badge">40%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
 
-                    <!-- 8. Nhạc Lofi -->
-                    <div class="sound-card glass-panel" data-sound="lofi">
-                        <div class="sound-info">
-                            <div class="sound-icon-container">
-                                <svg class="sound-svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
+                    <!-- Card 8: Lofi -->
+                    <div class="sound-card glass-card" data-sound="lofi">
+                        <div class="card-body">
+                            <div class="card-icon-wrapper">
+                                <svg class="card-svg-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3zM3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z"/></svg>
                             </div>
-                            <div class="sound-details">
+                            <div class="card-details">
                                 <h4>Nhạc Lofi</h4>
-                                <span class="sound-desc">Giai điệu lofi ấm êm đềm</span>
+                                <span class="card-desc">Giai điệu lofi nhẹ sâu lắng</span>
                             </div>
-                            <div class="sound-wave-anim">
+                            <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
                         </div>
-                        <div class="sound-controls">
-                            <input type="range" class="volume-slider" min="0" max="100" value="40">
-                            <button class="sound-toggle-btn">Bật</button>
+                        <div class="card-controls">
+                            <div class="slider-group">
+                                <input type="range" class="volume-slider" min="0" max="100" value="40">
+                                <span class="volume-badge">40%</span>
+                            </div>
+                            <button class="btn-toggle-sound">
+                                <span class="btn-text">Bật</span>
+                                <span class="spinner"></span>
+                            </button>
                         </div>
                     </div>
                 </div>
             </section>
         </main>
 
-        <!-- Footer / Audio Status Bar -->
+        <!-- Modern Footer -->
         <footer class="app-footer">
-            <p>&copy; 2026 forwork. Thiết kế tối ưu cho hiệu suất công việc.</p>
-            <div class="active-sounds-counter" id="active-sounds-indicator">
-                Chưa bật âm thanh nào
+            <div class="footer-left">
+                <span class="footer-dot"></span>
+                <span>forwork flow environment &copy; 2026. Made with ❤️.</span>
+            </div>
+            <div class="footer-right">
+                <div class="status-summary-bar" id="footer-mixer-status">
+                    Hệ thống âm thanh sẵn sàng
+                </div>
             </div>
         </footer>
     </div>
 
-    <!-- Container cho các YouTube Players (Sử dụng API) -->
-    <div id="youtube-players-container" class="hidden-players">
+    <!-- Hidden Iframe Container for YouTube APIs -->
+    <div id="youtube-players-container" class="youtube-hidden-players">
         <div id="yt-player-rain"></div>
         <div id="yt-player-campfire"></div>
         <div id="yt-player-nature"></div>
@@ -305,7 +429,7 @@
         <div id="yt-player-lofi"></div>
     </div>
 
-    <!-- File âm thanh chuông báo kết thúc Pomodoro (Dùng HTML Audio thông thường) -->
+    <!-- Alarm sound element for Pomodoro -->
     <audio id="timer-bell" src="https://assets.mixkit.co/active_storage/sfx/2869/2869-200.wav" preload="auto"></audio>
 
     <!-- YouTube IFrame Player API -->

@@ -1,28 +1,30 @@
 // Configurations for YouTube Ambient Sounds
 const SOUNDS_CONFIG = {
-    rain: { videoId: 'NDtBB-HCL1s', player: null, isPlaying: false, currentVolume: 50 },
-    campfire: { videoId: 'L_LUpnjgPso', player: null, isPlaying: false, currentVolume: 50 },
-    nature: { videoId: 'nMfPqeZ12FM', player: null, isPlaying: false, currentVolume: 50 },
-    ocean: { videoId: 'Nep1qytq9JM', player: null, isPlaying: false, currentVolume: 50 },
-    cafe: { videoId: 'gaGrHUekGrc', player: null, isPlaying: false, currentVolume: 50 },
-    thunder: { videoId: 'T-BOPr7NXME', player: null, isPlaying: false, currentVolume: 30 },
-    wind: { videoId: '3dfSip2HRBY', player: null, isPlaying: false, currentVolume: 40 },
-    lofi: { videoId: 'DWcUYDK81dQ', player: null, isPlaying: false, currentVolume: 40 }
+    rain: { videoId: 'wX-y0M-3p4U', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
+    campfire: { videoId: 'L_LUpnjgPso', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
+    nature: { videoId: '62G4V654_b4', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
+    ocean: { videoId: 'Nep1qytq9JM', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
+    cafe: { videoId: 'gaGrHUekGrc', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 50, fadeInterval: null },
+    thunder: { videoId: 'T-BOPr7NXME', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 30, fadeInterval: null },
+    wind: { videoId: 'H1yB3AX1j8A', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 40, fadeInterval: null },
+    lofi: { videoId: '5w3kADg-Xik', player: null, isPlaying: false, isActuallyPlaying: false, currentVolume: 40, fadeInterval: null }
 };
 
-// Presets configuration
+// Expanded Presets configuration
 const PRESETS = {
-    'rainy-cafe': { rain: 60, cafe: 70, thunder: 30, campfire: 0, nature: 0, ocean: 0, wind: 0, lofi: 0 },
-    'beach-camp': { campfire: 70, ocean: 80, wind: 30, rain: 0, nature: 0, cafe: 0, thunder: 0, lofi: 0 },
-    'deep-focus': { lofi: 50, rain: 40, wind: 20, campfire: 0, nature: 0, ocean: 0, cafe: 0, thunder: 0 },
-    'forest-storm': { nature: 50, rain: 70, thunder: 50, wind: 40, campfire: 0, ocean: 0, cafe: 0, lofi: 0 }
+    'rainy-cafe': { rain: 50, cafe: 60, thunder: 30, lofi: 30, campfire: 0, nature: 0, ocean: 0, wind: 0 },
+    'beach-camp': { campfire: 70, ocean: 50, wind: 30, rain: 0, nature: 0, cafe: 0, thunder: 0, lofi: 0 },
+    'deep-focus': { lofi: 40, rain: 30, wind: 20, campfire: 0, nature: 0, ocean: 0, cafe: 0, thunder: 0 },
+    'forest-storm': { nature: 40, rain: 80, thunder: 60, wind: 40, campfire: 0, ocean: 0, cafe: 0, lofi: 0 },
+    'sweet-dreams': { rain: 40, nature: 30, ocean: 30, campfire: 0, cafe: 0, thunder: 0, wind: 0, lofi: 0 },
+    'winter-cabin': { campfire: 60, wind: 50, rain: 30, nature: 0, ocean: 0, cafe: 0, thunder: 0, lofi: 0 }
 };
 
-// Global state variables
+// Global states
 let playersReadyCount = 0;
 const totalPlayersCount = Object.keys(SOUNDS_CONFIG).length;
 
-// Wait for YouTube Iframe API to load and initialize players
+// Initialize YouTube Players
 function onYouTubeIframeAPIReady() {
     Object.keys(SOUNDS_CONFIG).forEach(key => {
         const sound = SOUNDS_CONFIG[key];
@@ -34,8 +36,8 @@ function onYouTubeIframeAPIReady() {
                 autoplay: 0,
                 controls: 0,
                 loop: 1,
-                playlist: sound.videoId, // Required for loop in single video player
-                mute: 1, // Start muted to comply with browser autoplay policies
+                playlist: sound.videoId,
+                mute: 1, // Start muted for browser autoplay policies
                 playsinline: 1,
                 disablekb: 1,
                 fs: 0,
@@ -54,116 +56,169 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event, key) {
     playersReadyCount++;
     const sound = SOUNDS_CONFIG[key];
-    // Sync initial volume from state to YouTube player
-    sound.player.setVolume(sound.currentVolume);
+    sound.player.setVolume(0); // Start at volume 0 for fade-in logic
     
-    // Once all players are initialized
     if (playersReadyCount === totalPlayersCount) {
-        console.log("All YouTube players are ready.");
-        updateActiveSoundsIndicator();
+        document.getElementById('footer-mixer-status').textContent = 'Hệ thống âm thanh sẵn sàng';
     }
 }
 
+// State Machine Sync with YouTube IFrame Player API
 function onPlayerStateChange(event, key) {
     const sound = SOUNDS_CONFIG[key];
-    // Force loop if video ends (fallback mechanism if YT loop parameter fails)
-    if (event.data === YT.PlayerState.ENDED && sound.isPlaying) {
-        sound.player.playVideo();
+    
+    // When video starts actually playing (buffering completed)
+    if (event.data === YT.PlayerState.PLAYING) {
+        if (sound.isPlaying) {
+            // Unset loading state, set playing state
+            updateCardStateUI(key, 'playing');
+            sound.isActuallyPlaying = true;
+            fadeInAudio(key, sound.currentVolume);
+        } else {
+            // Safe guard: if user clicked 'Tắt' before it started playing
+            sound.player.pauseVideo();
+        }
+    }
+    
+    // If video is buffering
+    if (event.data === YT.PlayerState.BUFFERING) {
+        if (sound.isPlaying) {
+            updateCardStateUI(key, 'loading');
+        }
+    }
+
+    // Backup loop control
+    if (event.data === YT.PlayerState.ENDED) {
+        if (sound.isPlaying) {
+            sound.player.playVideo();
+        }
     }
 }
 
-// Fade Audio transition to prevent jarring volume jumps
-function fadeAudio(key, targetVolume, duration = 1200) {
+// Fade-in volume transition
+function fadeInAudio(key, targetVolume, duration = 1200) {
     const sound = SOUNDS_CONFIG[key];
     if (!sound.player || typeof sound.player.setVolume !== 'function') return;
 
-    const startVolume = sound.isPlaying ? sound.player.getVolume() : 0;
-    const steps = 24;
+    if (sound.fadeInterval) clearInterval(sound.fadeInterval);
+
+    const startVolume = sound.player.getVolume();
+    const steps = 20;
     const stepTime = duration / steps;
     const volumeStep = (targetVolume - startVolume) / steps;
     let currentStep = 0;
 
-    // If starting play, unmute and play video first
-    if (targetVolume > 0 && !sound.isPlaying) {
-        sound.isPlaying = true;
-        sound.player.unMute();
-        sound.player.playVideo();
-        updateSoundCardUI(key, true);
-    }
-
-    if (sound.fadeInterval) {
-        clearInterval(sound.fadeInterval);
-    }
-
     sound.fadeInterval = setInterval(() => {
         currentStep++;
         const newVol = startVolume + (volumeStep * currentStep);
-        sound.player.setVolume(Math.round(newVol));
+        sound.player.setVolume(Math.min(Math.round(newVol), 100));
 
         if (currentStep >= steps) {
             clearInterval(sound.fadeInterval);
             sound.player.setVolume(targetVolume);
-            
-            // If muting/turning off, pause and mute player
-            if (targetVolume === 0) {
-                sound.isPlaying = false;
-                sound.player.pauseVideo();
-                sound.player.mute();
-                updateSoundCardUI(key, false);
-            }
-            updateActiveSoundsIndicator();
         }
     }, stepTime);
 }
 
-// Toggle individual sound channel
+// Fade-out volume transition
+function fadeOutAudio(key, duration = 1000) {
+    const sound = SOUNDS_CONFIG[key];
+    if (!sound.player || typeof sound.player.setVolume !== 'function') return;
+
+    if (sound.fadeInterval) clearInterval(sound.fadeInterval);
+
+    const startVolume = sound.player.getVolume();
+    const steps = 20;
+    const stepTime = duration / steps;
+    const volumeStep = startVolume / steps;
+    let currentStep = 0;
+
+    sound.fadeInterval = setInterval(() => {
+        currentStep++;
+        const newVol = startVolume - (volumeStep * currentStep);
+        sound.player.setVolume(Math.max(Math.round(newVol), 0));
+
+        if (currentStep >= steps) {
+            clearInterval(sound.fadeInterval);
+            sound.player.setVolume(0);
+            sound.player.pauseVideo();
+            sound.player.mute();
+            sound.isActuallyPlaying = false;
+        }
+    }, stepTime);
+}
+
+// Toggle Sound with immediate visual feedback (no UI lag)
 function toggleSound(key) {
     const sound = SOUNDS_CONFIG[key];
+    
     if (sound.isPlaying) {
-        fadeAudio(key, 0); // Fade out to mute
+        // Turn OFF instantly in UI
+        sound.isPlaying = false;
+        updateCardStateUI(key, 'idle');
+        fadeOutAudio(key);
     } else {
-        fadeAudio(key, sound.currentVolume); // Fade in to current volume
+        // Turn ON instantly in UI (Loading state)
+        sound.isPlaying = true;
+        updateCardStateUI(key, 'loading');
+        
+        // Command YouTube Player to play under the hood
+        sound.player.unMute();
+        sound.player.setVolume(0); // Start at 0, fade will increase it
+        sound.player.playVideo();
     }
 }
 
-// Update DOM elements for a sound card when play state changes
-function updateSoundCardUI(key, isPlaying) {
+// Update UI card state instantly (idle, loading, playing)
+function updateCardStateUI(key, state) {
     const card = document.querySelector(`.sound-card[data-sound="${key}"]`);
     if (!card) return;
 
-    const toggleBtn = card.querySelector('.sound-toggle-btn');
-    if (isPlaying) {
+    const toggleBtn = card.querySelector('.btn-toggle-sound');
+    const btnText = toggleBtn.querySelector('.btn-text');
+
+    // Remove all state classes
+    card.classList.remove('playing', 'loading');
+
+    if (state === 'playing') {
         card.classList.add('playing');
-        toggleBtn.textContent = 'Tắt';
+        btnText.textContent = 'Tắt';
+    } else if (state === 'loading') {
+        card.classList.add('loading');
     } else {
-        card.classList.remove('playing');
-        toggleBtn.textContent = 'Bật';
+        btnText.textContent = 'Bật';
     }
+
+    updateFooterStatus();
 }
 
-// Update Active Sounds Bar Indicator
-function updateActiveSoundsIndicator() {
+// Update footer status bar summary
+function updateFooterStatus() {
     const activeKeys = Object.keys(SOUNDS_CONFIG).filter(k => SOUNDS_CONFIG[k].isPlaying);
-    const indicator = document.getElementById('active-sounds-indicator');
+    const activeText = document.getElementById('footer-mixer-status');
     
     if (activeKeys.length === 0) {
-        indicator.textContent = 'Chưa bật âm thanh nào';
+        activeText.textContent = 'Không có âm thanh nào đang phát';
     } else {
-        indicator.textContent = `Đang phát ${activeKeys.length} âm thanh`;
+        const names = activeKeys.map(k => {
+            const card = document.querySelector(`.sound-card[data-sound="${k}"]`);
+            return card ? card.querySelector('h4').textContent : k;
+        });
+        activeText.textContent = `Đang phối: ${names.join(', ')}`;
     }
 }
 
-// Apply Selected Preset
+// Apply Preset
 function applyPreset(presetKey) {
     const presetValues = PRESETS[presetKey];
     if (!presetValues) return;
 
-    // Reset active state for presets UI
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-        if (btn.dataset.preset === presetKey) {
-            btn.classList.add('active');
+    // Toggle active state in Preset buttons
+    document.querySelectorAll('.preset-card').forEach(card => {
+        if (card.dataset.preset === presetKey) {
+            card.classList.add('active');
         } else {
-            btn.classList.remove('active');
+            card.classList.remove('active');
         }
     });
 
@@ -171,19 +226,32 @@ function applyPreset(presetKey) {
         const targetVol = presetValues[key] || 0;
         const sound = SOUNDS_CONFIG[key];
         
-        // Sync custom slider input values in UI
+        // Sync Slider UI values
         const card = document.querySelector(`.sound-card[data-sound="${key}"]`);
         if (card) {
             const slider = card.querySelector('.volume-slider');
+            const badge = card.querySelector('.volume-badge');
             slider.value = targetVol > 0 ? targetVol : sound.currentVolume;
+            badge.textContent = `${slider.value}%`;
         }
 
         if (targetVol > 0) {
             sound.currentVolume = targetVol;
-            fadeAudio(key, targetVol);
+            if (!sound.isPlaying) {
+                sound.isPlaying = true;
+                updateCardStateUI(key, 'loading');
+                sound.player.unMute();
+                sound.player.setVolume(0);
+                sound.player.playVideo();
+            } else if (sound.isActuallyPlaying) {
+                // If already playing, just fade volume to target
+                fadeInAudio(key, targetVol, 800);
+            }
         } else {
             if (sound.isPlaying) {
-                fadeAudio(key, 0);
+                sound.isPlaying = false;
+                updateCardStateUI(key, 'idle');
+                fadeOutAudio(key, 800);
             }
         }
     });
@@ -191,12 +259,13 @@ function applyPreset(presetKey) {
 
 // Mute all active sounds
 function muteAll() {
-    // Remove preset active styling
-    document.querySelectorAll('.preset-btn').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.preset-card').forEach(card => card.classList.remove('active'));
 
     Object.keys(SOUNDS_CONFIG).forEach(key => {
         if (SOUNDS_CONFIG[key].isPlaying) {
-            fadeAudio(key, 0);
+            SOUNDS_CONFIG[key].isPlaying = false;
+            updateCardStateUI(key, 'idle');
+            fadeOutAudio(key, 600);
         }
     });
 }
@@ -205,9 +274,9 @@ function muteAll() {
 /* POMODORO TIMER LOGIC                                       */
 /* ========================================================== */
 const TIMER_MODES = {
-    work: { duration: 25 * 60, label: 'Làm việc thôi!' },
-    short: { duration: 5 * 60, label: 'Thư giãn chút nào!' },
-    long: { duration: 15 * 60, label: 'Nghỉ ngơi dài hơn!' }
+    work: { duration: 25 * 60, label: 'Tập trung cao độ' },
+    short: { duration: 5 * 60, label: 'Nghỉ giải lao ngắn' },
+    long: { duration: 15 * 60, label: 'Nghỉ ngơi nạp năng lượng' }
 };
 
 let currentMode = 'work';
@@ -219,10 +288,9 @@ const timerTimeDisplay = document.getElementById('timer-time');
 const timerStatusDisplay = document.getElementById('timer-status');
 const timerStartBtn = document.getElementById('timer-start');
 const timerResetBtn = document.getElementById('timer-reset');
-const progressCircle = document.querySelector('.progress-ring-bar');
+const progressCircle = document.querySelector('.progress-indicator .bar');
 
-// SVG Ring progress metrics
-const radius = 120;
+const radius = 130;
 const circumference = 2 * Math.PI * radius;
 
 if (progressCircle) {
@@ -249,12 +317,10 @@ function updateTimerDisplay() {
 }
 
 function switchTimerMode(mode) {
-    // Stop running interval
     clearInterval(timerInterval);
     timerInterval = null;
-    timerStartBtn.classList.remove('active');
     timerStartBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M8 5v14l11-7z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-svg"><path d="M8 5v14l11-7z"/></svg>
         <span>Bắt đầu</span>
     `;
 
@@ -263,8 +329,7 @@ function switchTimerMode(mode) {
     timeRemaining = totalDuration;
     timerStatusDisplay.textContent = TIMER_MODES[mode].label;
     
-    // Sync active state in UI tabs
-    document.querySelectorAll('.mode-btn').forEach(btn => {
+    document.querySelectorAll('.mode-selector-btn').forEach(btn => {
         if (btn.dataset.mode === mode) {
             btn.classList.add('active');
         } else {
@@ -277,18 +342,16 @@ function switchTimerMode(mode) {
 
 function toggleTimer() {
     if (timerInterval) {
-        // Pause timer
         clearInterval(timerInterval);
         timerInterval = null;
         timerStartBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M8 5v14l11-7z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-svg"><path d="M8 5v14l11-7z"/></svg>
             <span>Bắt đầu</span>
         `;
         timerStatusDisplay.textContent = 'Đang tạm dừng';
     } else {
-        // Start timer
         timerStartBtn.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-svg"><path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/></svg>
             <span>Tạm dừng</span>
         `;
         timerStatusDisplay.textContent = TIMER_MODES[currentMode].label;
@@ -298,17 +361,15 @@ function toggleTimer() {
             updateTimerDisplay();
 
             if (timeRemaining <= 0) {
-                // Completed Session
                 clearInterval(timerInterval);
                 timerInterval = null;
                 
-                // Play completion notification bell
                 const bell = document.getElementById('timer-bell');
-                if (bell) bell.play().catch(e => console.log('Audio playback permission error:', e));
+                if (bell) bell.play().catch(e => console.log('Audio error:', e));
 
-                timerStatusDisplay.textContent = 'Đã hoàn thành! Nhận thưởng nghỉ ngơi thôi.';
+                timerStatusDisplay.textContent = 'Hoàn thành phiên làm việc!';
                 timerStartBtn.innerHTML = `
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M8 5v14l11-7z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-svg"><path d="M8 5v14l11-7z"/></svg>
                     <span>Bắt đầu</span>
                 `;
             }
@@ -322,41 +383,48 @@ function resetTimer() {
     timeRemaining = totalDuration;
     timerStatusDisplay.textContent = TIMER_MODES[currentMode].label;
     timerStartBtn.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="btn-icon"><path d="M8 5v14l11-7z"/></svg>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon-svg"><path d="M8 5v14l11-7z"/></svg>
         <span>Bắt đầu</span>
     `;
     updateTimerDisplay();
 }
 
 /* ========================================================== */
-/* TODO CHECKLIST LOGIC                                       */
+/* CHECKLIST (TO-DO) LOGIC                                    */
 /* ========================================================== */
 let todos = JSON.parse(localStorage.getItem('forwork_todos')) || [
-    { id: 1, text: 'Hoàn thành báo cáo công việc', completed: false },
-    { id: 2, text: 'Đọc 10 trang sách lập trình', completed: true },
-    { id: 3, text: 'Uống đủ 2 lít nước hôm nay', completed: false }
+    { id: 1, text: 'Phác thảo ý tưởng thiết kế giao diện', completed: false },
+    { id: 2, text: 'Thiết lập danh sách phối âm yêu thích', completed: true },
+    { id: 3, text: 'Lên lịch trình làm việc ngày mai', completed: false }
 ];
 
 const todoForm = document.getElementById('todo-form');
 const todoInput = document.getElementById('todo-input');
 const todoList = document.getElementById('todo-list');
+const todoCountBadge = document.getElementById('todo-count');
+
+function updateTodoCount() {
+    const activeTasks = todos.filter(t => !t.completed).length;
+    todoCountBadge.textContent = `${activeTasks} việc cần làm`;
+}
 
 function renderTodos() {
     todoList.innerHTML = '';
     todos.forEach(todo => {
         const li = document.createElement('li');
-        li.className = 'todo-item';
+        li.className = 'checklist-item';
         li.innerHTML = `
-            <div class="todo-item-left">
-                <input type="checkbox" class="todo-checkbox" ${todo.completed ? 'checked' : ''} data-id="${todo.id}">
-                <span class="todo-text">${todo.text}</span>
+            <div class="checklist-item-left">
+                <input type="checkbox" class="todo-check-input" ${todo.completed ? 'checked' : ''} data-id="${todo.id}">
+                <span class="todo-label-text">${todo.text}</span>
             </div>
-            <button class="todo-delete-btn" data-id="${todo.id}">
+            <button class="todo-btn-delete" data-id="${todo.id}" title="Xóa việc">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/><line x1="10" y1="11" x2="10" y2="17"/><line x1="14" y1="11" x2="14" y2="17"/></svg>
             </button>
         `;
         todoList.appendChild(li);
     });
+    updateTodoCount();
 }
 
 function saveTodos() {
@@ -381,8 +449,7 @@ todoForm.addEventListener('submit', (e) => {
 });
 
 todoList.addEventListener('click', (e) => {
-    // Delete handling
-    const deleteBtn = e.target.closest('.todo-delete-btn');
+    const deleteBtn = e.target.closest('.todo-btn-delete');
     if (deleteBtn) {
         const id = parseInt(deleteBtn.dataset.id);
         todos = todos.filter(t => t.id !== id);
@@ -391,8 +458,7 @@ todoList.addEventListener('click', (e) => {
         return;
     }
 
-    // Toggle completed handling
-    const checkbox = e.target.closest('.todo-checkbox');
+    const checkbox = e.target.closest('.todo-check-input');
     if (checkbox) {
         const id = parseInt(checkbox.dataset.id);
         todos = todos.map(t => {
@@ -402,75 +468,71 @@ todoList.addEventListener('click', (e) => {
             return t;
         });
         saveTodos();
-        // Short timeout to let the strike-through style animation complete before re-render
-        setTimeout(renderTodos, 200);
+        setTimeout(renderTodos, 200); // Allow toggle check animation to complete
     }
 });
 
 /* ========================================================== */
-/* QUICK NOTES LOGIC                                          */
+/* AUTO-SAVE NOTES LOGIC                                      */
 /* ========================================================== */
 const notesTextarea = document.getElementById('notes-textarea');
 const saveIndicator = document.getElementById('save-indicator');
 let saveTimeout = null;
 
-// Load saved note
 notesTextarea.value = localStorage.getItem('forwork_notes') || '';
 
 notesTextarea.addEventListener('input', () => {
-    saveIndicator.textContent = 'Đang lưu tự động...';
     saveIndicator.classList.add('saving');
+    saveIndicator.querySelector('.status-txt').textContent = 'Đang lưu tự động...';
     
-    // Debounce auto-save logic to minimize write overhead
     clearTimeout(saveTimeout);
     saveTimeout = setTimeout(() => {
         localStorage.setItem('forwork_notes', notesTextarea.value);
-        saveIndicator.textContent = 'Đã lưu tự động';
         saveIndicator.classList.remove('saving');
+        saveIndicator.querySelector('.status-txt').textContent = 'Đã lưu cục bộ';
     }, 600);
 });
 
 /* ========================================================== */
-/* TABS NAVIGATION                                            */
+/* SPA TABS NAVIGATION                                        */
 /* ========================================================== */
-document.querySelectorAll('.tab-btn').forEach(btn => {
+document.querySelectorAll('.nav-tab').forEach(btn => {
     btn.addEventListener('click', () => {
         const targetTab = btn.dataset.tab;
         
-        // Toggle tab button active style
-        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.nav-tab').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
 
-        // Toggle tab content visibility
-        document.querySelectorAll('.tab-content').forEach(content => {
-            if (content.id === `tab-${targetTab}`) {
-                content.classList.add('active');
+        document.querySelectorAll('.tab-panel').forEach(panel => {
+            if (panel.id === `tab-${targetTab}`) {
+                panel.classList.add('active');
             } else {
-                content.classList.remove('active');
+                panel.classList.remove('active');
             }
         });
     });
 });
 
 /* ========================================================== */
-/* INIT EVENT LISTENERS FOR SOUND CARDS                        */
+/* INIT SOUND CARDS CONTROLS                                  */
 /* ========================================================== */
 function initSoundCards() {
     document.querySelectorAll('.sound-card').forEach(card => {
         const soundKey = card.dataset.sound;
-        const toggleBtn = card.querySelector('.sound-toggle-btn');
+        const toggleBtn = card.querySelector('.btn-toggle-sound');
         const slider = card.querySelector('.volume-slider');
+        const badge = card.querySelector('.volume-badge');
 
-        // Handle Click Play/Pause toggle
+        // Toggle click Bật/Tắt
         toggleBtn.addEventListener('click', () => toggleSound(soundKey));
 
-        // Handle Volume Slider interactions
+        // Volume slider update
         slider.addEventListener('input', (e) => {
             const vol = parseInt(e.target.value);
             SOUNDS_CONFIG[soundKey].currentVolume = vol;
+            badge.textContent = `${vol}%`;
 
-            // Update volume immediately in YouTube player if sound is playing
-            if (SOUNDS_CONFIG[soundKey].isPlaying) {
+            if (SOUNDS_CONFIG[soundKey].isActuallyPlaying) {
                 const player = SOUNDS_CONFIG[soundKey].player;
                 if (player && typeof player.setVolume === 'function') {
                     player.setVolume(vol);
@@ -482,25 +544,25 @@ function initSoundCards() {
     // Mute all trigger
     document.getElementById('mute-all-btn').addEventListener('click', muteAll);
 
-    // Preset button triggers
-    document.querySelectorAll('.preset-btn').forEach(btn => {
-        btn.addEventListener('click', () => {
-            const presetKey = btn.dataset.preset;
+    // Preset card click triggers
+    document.querySelectorAll('.preset-card').forEach(card => {
+        card.addEventListener('click', () => {
+            const presetKey = card.dataset.preset;
             applyPreset(presetKey);
         });
     });
 }
 
-// Attach event listeners to Pomodoro Timer
+// Pomodoro listeners
 timerStartBtn.addEventListener('click', toggleTimer);
 timerResetBtn.addEventListener('click', resetTimer);
-document.querySelectorAll('.mode-btn').forEach(btn => {
+document.querySelectorAll('.mode-selector-btn').forEach(btn => {
     btn.addEventListener('click', () => {
         switchTimerMode(btn.dataset.mode);
     });
 });
 
-// App Initialization
+// App Entry
 document.addEventListener('DOMContentLoaded', () => {
     renderTodos();
     initSoundCards();
