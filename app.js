@@ -1,13 +1,31 @@
+// Dynamic Script Loading for YouTube Player API to prevent load order bugs
+const tag = document.createElement('script');
+tag.src = "https://www.youtube.com/iframe_api";
+const firstScriptTag = document.getElementsByTagName('script')[0];
+firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+
 // Configurations for YouTube Ambient Sounds
 const SOUNDS_CONFIG = {
-    rain: { videoId: 'wX-y0M-3p4U', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
-    campfire: { videoId: 'L_LUpnjgPso', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
-    nature: { videoId: '62G4V654_b4', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
-    ocean: { videoId: 'Nep1qytq9JM', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
-    cafe: { videoId: 'gaGrHUekGrc', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null },
-    thunder: { videoId: 'T-BOPr7NXME', player: null, isPlaying: false, currentVolume: 30, fadeInterval: null },
-    wind: { videoId: 'H1yB3AX1j8A', player: null, isPlaying: false, currentVolume: 40, fadeInterval: null },
-    lofi: { videoId: '5w3kADg-Xik', player: null, isPlaying: false, currentVolume: 40, fadeInterval: null }
+    rain: { videoId: 'wX-y0M-3p4U', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null, useFallback: false, fallbackAudio: null },
+    campfire: { videoId: 'L_LUpnjgPso', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null, useFallback: false, fallbackAudio: null },
+    nature: { videoId: '62G4V654_b4', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null, useFallback: false, fallbackAudio: null },
+    ocean: { videoId: 'Nep1qytq9JM', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null, useFallback: false, fallbackAudio: null },
+    cafe: { videoId: 'gaGrHUekGrc', player: null, isPlaying: false, currentVolume: 50, fadeInterval: null, useFallback: false, fallbackAudio: null },
+    thunder: { videoId: 'T-BOPr7NXME', player: null, isPlaying: false, currentVolume: 30, fadeInterval: null, useFallback: false, fallbackAudio: null },
+    wind: { videoId: 'H1yB3AX1j8A', player: null, isPlaying: false, currentVolume: 40, fadeInterval: null, useFallback: false, fallbackAudio: null },
+    lofi: { videoId: '5w3kADg-Xik', player: null, isPlaying: false, currentVolume: 40, fadeInterval: null, useFallback: false, fallbackAudio: null }
+};
+
+// Fallback HTML5 Audio URLs (High quality loopable tracks from soundjay / public archives)
+const FALLBACK_AUDIO_URLS = {
+    rain: 'https://www.soundjay.com/nature/sounds/rain-07.mp3',
+    campfire: 'https://www.soundjay.com/nature/sounds/fire-1.mp3',
+    nature: 'https://www.soundjay.com/nature/sounds/forest-wind-1.mp3',
+    ocean: 'https://www.soundjay.com/nature/sounds/ocean-wave-1.mp3',
+    cafe: 'https://assets.mixkit.co/active_storage/sfx/2433/2433-84.wav',
+    thunder: 'https://www.soundjay.com/nature/sounds/thunder-2.mp3',
+    wind: 'https://www.soundjay.com/nature/sounds/wind-weather-01.mp3',
+    lofi: 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
 };
 
 // Presets configuration
@@ -46,7 +64,8 @@ function onYouTubeIframeAPIReady() {
             },
             events: {
                 onReady: (event) => onPlayerReady(event, key),
-                onStateChange: (event) => onPlayerStateChange(event, key)
+                onStateChange: (event) => onPlayerStateChange(event, key),
+                onError: (event) => onPlayerError(event, key)
             }
         });
     });
@@ -56,7 +75,7 @@ function onPlayerReady(event, key) {
     playersReadyCount++;
     const sound = SOUNDS_CONFIG[key];
     
-    // Command player to start playing muted immediately under the hood
+    // Play muted and volume 0 under the hood
     sound.player.mute();
     sound.player.setVolume(0);
     sound.player.playVideo();
@@ -86,29 +105,95 @@ function onPlayerStateChange(event, key) {
     }
 }
 
+// Fallback logic if YouTube video ID fails to load (due to copyrights, embed limits, region blocks, etc.)
+function onPlayerError(event, key) {
+    console.warn(`YouTube player error for [${key}] - Code: ${event.data}. Activating HTML5 Audio fallback...`);
+    initializeFallbackAudio(key);
+}
+
+function initializeFallbackAudio(key) {
+    const sound = SOUNDS_CONFIG[key];
+    if (sound.useFallback) return; // Guard clause if already fallback active
+
+    sound.useFallback = true;
+    
+    // Initialize HTML5 Audio Element
+    sound.fallbackAudio = new Audio(FALLBACK_AUDIO_URLS[key]);
+    sound.fallbackAudio.loop = true;
+    sound.fallbackAudio.volume = 0;
+    
+    // Update Badge tag on Card UI
+    const badgeTag = document.getElementById(`status-tag-${key}`);
+    if (badgeTag) {
+        badgeTag.textContent = "Dự phòng (Audio)";
+        badgeTag.style.color = "var(--secondary-color)";
+    }
+
+    // Play if toggle state was ON
+    if (sound.isPlaying) {
+        sound.fallbackAudio.play().catch(e => console.log("Audio autoplay prevented, awaiting interaction:", e));
+        fadeAudio(key, sound.currentVolume);
+    }
+}
+
 // Instant Fade Audio (200ms duration for click feedback, no lag)
 function fadeAudio(key, targetVolume, duration = 200) {
     const sound = SOUNDS_CONFIG[key];
-    if (!sound.player || typeof sound.player.setVolume !== 'function') return;
+    
+    // Fallback HTML5 Audio Control
+    if (sound.useFallback) {
+        if (!sound.fallbackAudio) return;
+        
+        if (sound.fadeInterval) clearInterval(sound.fadeInterval);
+        
+        const startVolume = sound.fallbackAudio.volume; // 0.0 to 1.0
+        const targetVolFloat = targetVolume / 100;
+        const steps = 10;
+        const stepTime = duration / steps;
+        const volumeStep = (targetVolFloat - startVolume) / steps;
+        let currentStep = 0;
 
-    if (sound.fadeInterval) clearInterval(sound.fadeInterval);
-
-    const startVolume = sound.player.getVolume();
-    const steps = 10;
-    const stepTime = duration / steps;
-    const volumeStep = (targetVolume - startVolume) / steps;
-    let currentStep = 0;
-
-    sound.fadeInterval = setInterval(() => {
-        currentStep++;
-        const newVol = startVolume + (volumeStep * currentStep);
-        sound.player.setVolume(Math.min(Math.max(Math.round(newVol), 0), 100));
-
-        if (currentStep >= steps) {
-            clearInterval(sound.fadeInterval);
-            sound.player.setVolume(targetVolume);
+        if (targetVolFloat > 0) {
+            sound.fallbackAudio.play().catch(e => console.log(e));
         }
-    }, stepTime);
+
+        sound.fadeInterval = setInterval(() => {
+            currentStep++;
+            const newVol = startVolume + (volumeStep * currentStep);
+            sound.fallbackAudio.volume = Math.min(Math.max(newVol, 0), 1);
+
+            if (currentStep >= steps) {
+                clearInterval(sound.fadeInterval);
+                sound.fallbackAudio.volume = targetVolFloat;
+                if (targetVolFloat === 0) {
+                    sound.fallbackAudio.pause();
+                }
+            }
+        }, stepTime);
+        
+    } else {
+        // YouTube API Control
+        if (!sound.player || typeof sound.player.setVolume !== 'function') return;
+
+        if (sound.fadeInterval) clearInterval(sound.fadeInterval);
+
+        const startVolume = sound.player.getVolume(); // 0 to 100
+        const steps = 10;
+        const stepTime = duration / steps;
+        const volumeStep = (targetVolume - startVolume) / steps;
+        let currentStep = 0;
+
+        sound.fadeInterval = setInterval(() => {
+            currentStep++;
+            const newVol = startVolume + (volumeStep * currentStep);
+            sound.player.setVolume(Math.min(Math.max(Math.round(newVol), 0), 100));
+
+            if (currentStep >= steps) {
+                clearInterval(sound.fadeInterval);
+                sound.player.setVolume(targetVolume);
+            }
+        }, stepTime);
+    }
 }
 
 // Toggle sound instantly
@@ -123,9 +208,16 @@ function toggleSound(key) {
         sound.isPlaying = true;
         updateCardUI(key, true);
         
-        // Ensure video is playing and fade volume up immediately
-        sound.player.playVideo();
-        fadeAudio(key, sound.currentVolume);
+        if (sound.useFallback) {
+            if (sound.fallbackAudio) {
+                sound.fallbackAudio.play().catch(e => console.log("Interaction required:", e));
+                fadeAudio(key, sound.currentVolume);
+            }
+        } else {
+            // Safe guard if browser blocked background autoplays
+            sound.player.playVideo();
+            fadeAudio(key, sound.currentVolume);
+        }
     }
 }
 
@@ -134,15 +226,10 @@ function updateCardUI(key, isPlaying) {
     const card = document.querySelector(`.sound-card[data-sound="${key}"]`);
     if (!card) return;
 
-    const toggleBtn = card.querySelector('.btn-toggle-sound');
-    const btnText = toggleBtn.querySelector('.btn-text');
-
     if (isPlaying) {
         card.classList.add('playing');
-        btnText.textContent = 'Tắt';
     } else {
         card.classList.remove('playing');
-        btnText.textContent = 'Bật';
     }
 
     updateFooterStatus();
@@ -169,7 +256,7 @@ function applyPreset(presetKey) {
     if (!presetValues) return;
 
     // Update active visual class in presets list
-    document.querySelectorAll('.preset-card').forEach(card => {
+    document.querySelectorAll('.preset-pill-btn').forEach(card => {
         if (card.dataset.preset === presetKey) {
             card.classList.add('active');
         } else {
@@ -194,7 +281,14 @@ function applyPreset(presetKey) {
             sound.currentVolume = targetVol;
             sound.isPlaying = true;
             updateCardUI(key, true);
-            sound.player.playVideo();
+            
+            if (sound.useFallback) {
+                if (sound.fallbackAudio) {
+                    sound.fallbackAudio.play().catch(e => console.log(e));
+                }
+            } else {
+                sound.player.playVideo();
+            }
             fadeAudio(key, targetVol);
         } else {
             sound.isPlaying = false;
@@ -206,7 +300,7 @@ function applyPreset(presetKey) {
 
 // Mute all active sounds instantly
 function muteAll() {
-    document.querySelectorAll('.preset-card').forEach(card => card.classList.remove('active'));
+    document.querySelectorAll('.preset-pill-btn').forEach(card => card.classList.remove('active'));
 
     Object.keys(SOUNDS_CONFIG).forEach(key => {
         if (SOUNDS_CONFIG[key].isPlaying) {
@@ -466,21 +560,29 @@ document.querySelectorAll('.nav-tab').forEach(btn => {
 function initSoundCards() {
     document.querySelectorAll('.sound-card').forEach(card => {
         const soundKey = card.dataset.sound;
-        const toggleBtn = card.querySelector('.btn-toggle-sound');
+        const toggleSwitch = card.querySelector('.sound-toggle-switch');
         const slider = card.querySelector('.volume-slider');
         const badge = card.querySelector('.volume-badge');
 
-        toggleBtn.addEventListener('click', () => toggleSound(soundKey));
+        // Toggle Switch Bật/Tắt
+        toggleSwitch.addEventListener('click', () => toggleSound(soundKey));
 
+        // Volume slider update
         slider.addEventListener('input', (e) => {
             const vol = parseInt(e.target.value);
             SOUNDS_CONFIG[soundKey].currentVolume = vol;
             badge.textContent = `${vol}%`;
 
             if (SOUNDS_CONFIG[soundKey].isPlaying) {
-                const player = SOUNDS_CONFIG[soundKey].player;
-                if (player && typeof player.setVolume === 'function') {
-                    player.setVolume(vol);
+                if (SOUNDS_CONFIG[soundKey].useFallback) {
+                    if (SOUNDS_CONFIG[soundKey].fallbackAudio) {
+                        SOUNDS_CONFIG[soundKey].fallbackAudio.volume = vol / 100;
+                    }
+                } else {
+                    const player = SOUNDS_CONFIG[soundKey].player;
+                    if (player && typeof player.setVolume === 'function') {
+                        player.setVolume(vol);
+                    }
                 }
             }
         });
@@ -488,7 +590,7 @@ function initSoundCards() {
 
     document.getElementById('mute-all-btn').addEventListener('click', muteAll);
 
-    document.querySelectorAll('.preset-card').forEach(card => {
+    document.querySelectorAll('.preset-pill-btn').forEach(card => {
         card.addEventListener('click', () => {
             const presetKey = card.dataset.preset;
             applyPreset(presetKey);
