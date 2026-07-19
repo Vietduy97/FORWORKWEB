@@ -153,10 +153,10 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Mưa rơi</h4>
-                                    <span class="card-indicator-tag" id="status-tag-rain">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
-                            <!-- Modern Toggle Switch Button -->
+                            <!-- Toggle Switch -->
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
                                 <span class="switch-handle"></span>
                             </button>
@@ -167,7 +167,6 @@
                                 <input type="range" class="volume-slider" min="0" max="100" value="50">
                                 <span class="volume-badge">50%</span>
                             </div>
-                            <!-- Dynamic soundwave visualizer -->
                             <div class="wave-visualizer">
                                 <span></span><span></span><span></span><span></span>
                             </div>
@@ -183,7 +182,7 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Bếp củi</h4>
-                                    <span class="card-indicator-tag" id="status-tag-campfire">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
@@ -211,7 +210,7 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Thiên nhiên</h4>
-                                    <span class="card-indicator-tag" id="status-tag-nature">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
@@ -239,7 +238,7 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Sóng biển</h4>
-                                    <span class="card-indicator-tag" id="status-tag-ocean">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
@@ -267,7 +266,7 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Quán Cafe</h4>
-                                    <span class="card-indicator-tag" id="status-tag-cafe">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
@@ -295,7 +294,7 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Sấm bão</h4>
-                                    <span class="card-indicator-tag" id="status-tag-thunder">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
@@ -323,7 +322,7 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Gió thổi</h4>
-                                    <span class="card-indicator-tag" id="status-tag-wind">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
@@ -351,7 +350,7 @@
                                 </div>
                                 <div class="card-heading">
                                     <h4>Nhạc Lofi</h4>
-                                    <span class="card-indicator-tag" id="status-tag-lofi">Mặc định (YT)</span>
+                                    <span class="card-indicator-tag">Premium Audio</span>
                                 </div>
                             </div>
                             <button class="sound-toggle-switch" title="Bật/Tắt âm thanh">
@@ -381,22 +380,22 @@
             </div>
             <div class="footer-right">
                 <div class="status-summary-bar" id="footer-mixer-status">
-                    Đang nạp hệ thống âm thanh...
+                    Hệ thống âm thanh sẵn sàng
                 </div>
             </div>
         </footer>
     </div>
 
-    <!-- Hidden Iframe Container for YouTube APIs -->
-    <div id="youtube-players-container" class="youtube-hidden-players">
-        <div id="yt-player-rain"></div>
-        <div id="yt-player-campfire"></div>
-        <div id="yt-player-nature"></div>
-        <div id="yt-player-ocean"></div>
-        <div id="yt-player-cafe"></div>
-        <div id="yt-player-thunder"></div>
-        <div id="yt-player-wind"></div>
-        <div id="yt-player-lofi"></div>
+    <!-- Hidden HTML5 Audio Elements for Chill Ambient Mixes -->
+    <div class="audio-hidden-nodes">
+        <audio id="audio-rain" src="https://www.soundjay.com/nature/sounds/rain-07.mp3" preload="auto" loop></audio>
+        <audio id="audio-campfire" src="https://www.soundjay.com/nature/sounds/fire-1.mp3" preload="auto" loop></audio>
+        <audio id="audio-nature" src="https://www.soundjay.com/nature/sounds/birds-singing-01.mp3" preload="auto" loop></audio>
+        <audio id="audio-ocean" src="https://www.soundjay.com/nature/sounds/ocean-wave-1.mp3" preload="auto" loop></audio>
+        <audio id="audio-cafe" src="https://assets.mixkit.co/active_storage/sfx/2433/2433-84.wav" preload="auto" loop></audio>
+        <audio id="audio-thunder" src="https://www.soundjay.com/nature/sounds/thunder-2.mp3" preload="auto" loop></audio>
+        <audio id="audio-wind" src="https://www.soundjay.com/nature/sounds/wind-weather-01.mp3" preload="auto" loop></audio>
+        <audio id="audio-lofi" src="https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3" preload="auto" loop></audio>
     </div>
 
     <!-- Alarm sound element for Pomodoro -->

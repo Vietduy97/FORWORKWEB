@@ -92,7 +92,7 @@ body {
     100% { transform: translate(-30px, -50px) scale(0.9); }
 }
 
-/* App structure container */
+/* App container */
 .app-container {
     width: 100%;
     max-width: 1200px;
@@ -205,7 +205,7 @@ body {
     height: 18px;
 }
 
-/* Glassmorphism Panel styles */
+/* Glassmorphism Panels */
 .glass-card {
     background: var(--bg-card);
     border: 1px solid var(--border-light);
@@ -236,7 +236,7 @@ body {
 }
 
 /* ========================================= */
-/* TAB 1: FOCUS AREA                         */
+/* TAB 1: FOCUS AREA STYLING                 */
 /* ========================================= */
 .focus-grid {
     display: grid;
@@ -379,7 +379,7 @@ body {
     height: 22px;
 }
 
-/* Widgets area */
+/* Utility Widgets Area */
 .utility-widgets {
     display: flex;
     flex-direction: column;
@@ -415,7 +415,7 @@ body {
     font-weight: 700;
 }
 
-/* Todo list */
+/* Checklist Todo */
 .todo-widget {
     height: 310px;
 }
@@ -627,7 +627,6 @@ body {
 /* TAB 2: SOUND MIXER & PRESETS              */
 /* ========================================= */
 
-/* Compact top control bar */
 .mixer-controls-top {
     padding: 1.25rem 2rem;
     margin-bottom: 2rem;
@@ -714,13 +713,12 @@ body {
     gap: 1.25rem;
 }
 
-/* REDESIGNED: Compact Sound Card styling */
 .sound-card {
     padding: 1.2rem;
     display: flex;
     flex-direction: column;
     justify-content: space-between;
-    height: 135px; /* Compact height */
+    height: 135px;
     border-radius: var(--radius-md);
 }
 
@@ -730,7 +728,7 @@ body {
     box-shadow: 0 8px 30px rgba(99, 102, 241, 0.12);
 }
 
-/* Header section of compact sound card */
+/* Header section of sound card */
 .card-main-info {
     display: flex;
     justify-content: space-between;
@@ -789,7 +787,7 @@ body {
     color: var(--text-accent);
 }
 
-/* Premium toggle switch */
+/* Switch styling */
 .sound-toggle-switch {
     position: relative;
     width: 38px;
@@ -824,7 +822,7 @@ body {
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
-/* Bottom area of compact sound card */
+/* Bottom area of sound card */
 .card-bottom-controls {
     display: flex;
     align-items: center;
@@ -951,23 +949,9 @@ body {
     color: var(--text-secondary);
 }
 
-/* Hidden YouTube frames container - Absolutely Embedded and Out of view */
-.youtube-hidden-players {
-    position: fixed !important;
-    top: 0 !important;
-    left: -9999px !important;
-    width: 300px !important;
-    height: 300px !important;
-    opacity: 0.0001 !important;
-    pointer-events: none !important;
-    overflow: hidden !important;
-    z-index: -99999 !important;
-}
-
-.youtube-hidden-players iframe {
-    width: 100% !important;
-    height: 100% !important;
-    border: none !important;
+/* Hidden Audio Elements Container */
+.audio-hidden-nodes {
+    display: none !important;
 }
 
 /* Responsive layout adjustments */
